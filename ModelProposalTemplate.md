@@ -1,6 +1,6 @@
-# Model Proposal for _[Project Name]_
+# Model Proposal for _Farmer decision making and climate change_
 
-_Your Name_
+_Harrison Smith_
 
 * Course ID: CMPLXSYS 530,
 * Course Title: Computer Modeling of Complex Systems
