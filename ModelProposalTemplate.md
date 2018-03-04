@@ -13,7 +13,7 @@ _Harrison Smith_
 ### Goal 
 *****
  
-The goal of this model will be to explore how small-holder farmers in different contexts may respond or adapt to climate change. Specifically, it will focus on how individual perceptions of climate change may affect sow dates at the landscape level. 
+The goal of this model will be to explore how farmers in different contexts may respond or adapt to climate change. Specifically, it will focus on how individual perceptions of climate change may affect sow dates and the agricultural matrix at the landscape level. 
 
 &nbsp;  
 ### Justification
@@ -24,7 +24,7 @@ Farmer decision is a complex and heterogeneous process that is highly context de
 ### Main Micro-level Processes and Macro-level Dynamics of Interest
 ****
 
-Farmer decision making at the individual level is dependent on many factors, such as income, irrigation type, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding what date to sow their crops. If the first iteration of this is successful, I would eventually like to incorporate other factors such as wealth of farmers, irrigation type, market access, and different farm sizes. At the Macro-level, this model will examine the dynamics of how crop yields are affected by a changing climate, and how and when farmers are able to respond to these changes. The emergent agricultural matrix that results from heterogeneous farmer decision making will also be the subject of analysis.
+Farmer decision making at the individual level is dependent on many factors, such as income, irrigation type, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding what date to sow their crops. If the first iteration of this is successful, I would eventually like to incorporate other factors such as wealth of farmers, irrigation type, market access, and different farm sizes. At the Macro-level, this model will examine the dynamics of how crop yields are affected by a changing climate, and if or how farmers are able to respond to these changes. The emergent agricultural matrix that results from heterogeneous farmer decision making will also be the subject of analysis.
 
 
 &nbsp; 
@@ -32,13 +32,21 @@ Farmer decision making at the individual level is dependent on many factors, suc
 ****
 &nbsp; 
 ### 1) Environment
-_Description of the environment in your model. Things to specify *if they apply*:_
+The space of the model will consist of a 2D grid where each cell represents a farmer's plot. Each agent (farmer) will be located on a single cell and will interact only with that cell and the global environment.
 
-* _Boundary conditions (e.g. wrapping, infinite, etc.)_
-* _Dimensionality (e.g. 1D, 2D, etc.)_
-* _List of environment-owned variables (e.g. resources, states, roughness)_
-* _List of environment-owned methods/procedures (e.g. resource production, state change, etc.)_
-
+Environment-owned variables
+    * Temperature (The rate of temperature increase per year, ranging from 0 to 0.1)
+    * Monsoon Season (True or false value, true for only for 175 because monsoon season is ~6 months)
+    * Water (The amount of water currently located on each grid cell, ranging from 0 to 1)
+    * Yield (The amount of crop biomass currently located on each grid cell, ranging from 0 to 10)
+Environment-owned methods/procedures
+    * Initialize (random water in all grid cells)
+    * Evaporate (water evaporates as a function of temperature)
+    * Rain (replenishes water in grid cells. Amount of rain is dependent on if Monsoon season = T or F)
+    * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
+    * End Monsoon (set Monsoon = F after 175 steps)
+    * Grow (crops grow if the cell has been sown and water content > 0. Growth rate is a function of water and continues for 120 steps)
+    * Die (crops die if water < 0.25 for too long)
 
 ```python
 # Include first pass of the code you are thinking of using to construct your environment
