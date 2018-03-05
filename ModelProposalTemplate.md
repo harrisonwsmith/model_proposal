@@ -35,7 +35,8 @@ Farmer decision making at the individual level is dependent on many factors, suc
 The space of the model will consist of a 2D grid where each cell represents a farmer's plot. Each agent (farmer) will be located on a single cell and will interact only with that cell and the global environment.
 
 Environment-owned variables
-* Temperature (The rate of temperature increase per year, ranging from 0 to 0.1)
+* Temperature (average temperature for the season)
+* Temperature rate of change (The rate of temperature increase per year, ranging from 0 to 0.1)
 * Monsoon Season (True or false value, true for only for 50 steps)
 * Water (The amount of water currently located on each grid cell, ranging from 0 to 1)
 * Drain rate (a randomly generated rate of drainage of water from each cell) 
@@ -50,7 +51,7 @@ Environment-owned methods/procedures
 * Rain (replenishes water in grid cells. Amount of rain is dependent on if Monsoon season = T or F)
 * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
 * End Monsoon (set Monsoon = F after 50 steps)
-* Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 120 steps)
+* Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 40 steps)
 * Die (crops die if water < 0.2 for too long)
 
 ```python
@@ -103,7 +104,8 @@ Each cell will:
 
 Each agent will:
 1. Sow crops if not sown yet and store the sow date
-2. Record total yeild if date = (sow date) + 50
+2. Record total yield and then set yield to zero if date = (sow date) + 50
+
 
 
 &nbsp; 
@@ -115,26 +117,33 @@ The model will be initialized with no crops and a start time (t) of zero. Draina
 
 The model schedule will then procede as follows:
 1. Model is initialized using above description
-2. Farmers sow crops using baseline t=5, monsoon starts at t=5
-3. If a cell has sufficient water, plants grow (growth rate is a sigmoid function where x=water amount)
-4. After 50 steps from sow date, crops stop growing
-5. After 50 steps, the monsoon season ends
-5. Farmer's harvest crops
-6. Adjust monsoon start date based on temperature rate change
-7. Restart the growing season (t=0)
-8. Farmer's calculate new sow date using mean of last 5 monsoon start dates
-
-
-
+2. Farmers sow crops using baseline (t=10) or average of 5 previous monsoon start dates
+3. Monsoon starts at t=10 intially, but is delayed as a function of temperature increase rate
+4. If a cell has sufficient water, plants grow (growth rate is a sigmoid function where x=water amount)
+5. After 40 steps from sow date, crops stop growing
+6. After 50 steps, the monsoon season ends
+7. Farmer's harvest crops
+8. Adjust monsoon start date based on temperature rate change
+9. Run model until monsoon season ends
+10. Restart the growing season (t=0)
+11. Farmer's calculate new sow date using previous monsoon start dates
+12. Update temperature using rate of temperature change
+13. Update evaporation rate using new temperature
+12. Update Monsoon start date using temperature
+13. Repeat above steps for specified number of "seasons"
 
 &nbsp; 
 
 ### 5) Assessment and Outcome Measures
 
-_What quantitative metrics and/or qualitative features will you use to assess your model outcomes?_
+In order to assess my model outcomes, I will use several metrics. The main metric I will look at will be sow date over time, which will answer my central question of how sow date will change in response to perception of climate change. I will also look at overall yield for each pixel and how that corresponds to sow date, and I will use this to determine the adaptive capacity of farmers in the face of climate change. 
+
+In future iterations, I would also like to incorporate other factors such as income and wealth generated from crops. If I am able to incorporate these factors, I will also gather data on changes in wealth in order to assess my model outcomes.
 
 &nbsp; 
 
 ### 6) Parameter Sweep
 
-_What parameters are you most interested in sweeping through? What value ranges do you expect to look at for your analysis?_
+The main parameter sweep I would look at is how different rates of temperature change affect farmer's ability grow crops and how it affects their sow date. I think it will also be interesting to look at different amounts of rainfall and how this might affect the results I get. 
+
+In future iterations, I also hope to look at how different ranges of wealth, irrigation, or access to markets might affect my results. These parameters would also be included in a parameter sweep. 
