@@ -59,6 +59,33 @@ Environment-owned methods/procedures
 # This may be a set of "patches-own" variables and a command in the "setup" procedure, a list, an array, or Class constructor
 # Feel free to include any patch methods/procedures you have. Filling in with pseudocode is ok! 
 # NOTE: If using Netlogo, remove "python" from the markdown at the top of this section to get a generic code block
+
+# Imports
+import numpy
+import matplotlib.pyplot as plt
+import pandas
+
+# Import widget methods
+from ipywidgets import interact
+
+class Model:
+    def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
+        self.grid_size = grid_size
+        self.temp_init = #
+        self.temp_change = #
+        self.water = #
+        self.yield = #
+        self.drain_rate = # randomly distribute drainage rates among cells
+        self.evaporate = #  a constant * temperature
+        self.rainprob = # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
+        self.rain = # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
+        self.monsoon_init = # if t=10, set True, ends at t=60
+        self.monsoon_new = # update monsoon date based on temperature
+        self.grow = # grow crops if seeded and if water
+        self.die = # kill crops if no water or temp too high
+        
+        self.t = 0
+        self.space = numpy.array((0,0,0)) # this needs to be a 3D array I think...
 ```
 
 &nbsp; 
