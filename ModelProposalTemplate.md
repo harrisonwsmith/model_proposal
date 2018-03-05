@@ -36,21 +36,22 @@ The space of the model will consist of a 2D grid where each cell represents a fa
 
 Environment-owned variables
 * Temperature (The rate of temperature increase per year, ranging from 0 to 0.1)
-* Monsoon Season (True or false value, true for only for 150 because monsoon season is ~5 months)
+* Monsoon Season (True or false value, true for only for 50 steps)
 * Water (The amount of water currently located on each grid cell, ranging from 0 to 1)
 * Drain rate (a randomly generated rate of drainage of water from each cell) 
-* Yield (The amount of crop biomass currently located on each grid cell, ranging from 0 to 10)
+* Yield (The amount of crop biomass currently located on each grid cell)
 
 
 Environment-owned methods/procedures  
 * Initialize (random drain rate seed in all grid cells)
 * Drain (water is depleted from each cell by fixed amount per step)
 * Evaporate (water evaporates as a function of temperature)
-* Rain (replenishes water in grid cells. Amount and frequency of rain is dependent on if Monsoon season = T or F)
+* Rain probability (probability of rainfall, will be higher probability during monsoon)
+* Rain (replenishes water in grid cells. Amount of rain is dependent on if Monsoon season = T or F)
 * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
-* End Monsoon (set Monsoon = F after 175 steps)
-* Grow (crops grow if the cell has been sown and water content > 0.25 Growth rate is a function of water and continues for 120 steps)
-* Die (crops die if water < 0.25 for too long)
+* End Monsoon (set Monsoon = F after 50 steps)
+* Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 120 steps)
+* Die (crops die if water < 0.2 for too long)
 
 ```python
 # Include first pass of the code you are thinking of using to construct your environment
@@ -90,20 +91,41 @@ In the first round, agents will only interact with their own grid cell or 'plot'
  
 **_Action Sequence_**
 
-_What does an agent, cell, etc. do on a given turn? Provide a step-by-step description of what happens on a given turn for each part of your model_
+In a given turn... 
 
-1. Step 1
-2. Step 2
-3. Etc...
+The environment will:
+1. Set evaporation rates as a function of current temperature
+2. Test probability of rain, if True then rain on all cells
+
+Each cell will:
+1. Change the amount of water in each cell based on evaporation rate and drainage rate
+2. Grow crops if there is enough water, the cell is sown, and it is during growing season (within 50 days of sow date)
+
+Each agent will:
+1. Sow crops if not sown yet and store the sow date
+2. Record total yeild if date = (sow date) + 50
+
 
 &nbsp; 
 ### 4) Model Parameters and Initialization
 
-_Describe and list any global parameters you will be applying in your model._
+The global parameters that will be used in this model will be temperature, evaporation rate, growth rate, and monsoon season.
 
-_Describe how your model will be initialized_
+The model will be initialized with no crops and a start time (t) of zero. Drainage rates will be randomly distributed throughout the grid using a specified seed, and evaporation rate will be calculated based on the temperature. Initial rain probability and amount will be set for the non-monsoon season, and an initial rain event will add some water to all patches. Farmers will sow their crops using a baseline (the "historical" start date of the monsoon) when t=5, or after 5 steps. In the first round or "season", the monsoon will start on this baseline date (t=5). After cells have been sown, crops will grow as a function of water availability (sigmoid function).
 
-_Provide a high level, step-by-step description of your schedule during each "tick" of the model_
+The model schedule will then procede as follows:
+1. Model is initialized using above description
+2. Farmers sow crops using baseline t=5, monsoon starts at t=5
+3. If a cell has sufficient water, plants grow (growth rate is a sigmoid function where x=water amount)
+4. After 50 steps from sow date, crops stop growing
+5. After 50 steps, the monsoon season ends
+5. Farmer's harvest crops
+6. Adjust monsoon start date based on temperature rate change
+7. Restart the growing season (t=0)
+8. Farmer's calculate new sow date using mean of last 5 monsoon start dates
+
+
+
 
 &nbsp; 
 
