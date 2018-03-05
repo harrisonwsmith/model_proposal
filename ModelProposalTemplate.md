@@ -36,17 +36,20 @@ The space of the model will consist of a 2D grid where each cell represents a fa
 
 Environment-owned variables
 * Temperature (The rate of temperature increase per year, ranging from 0 to 0.1)
-* Monsoon Season (True or false value, true for only for 175 because monsoon season is ~6 months)
+* Monsoon Season (True or false value, true for only for 150 because monsoon season is ~5 months)
 * Water (The amount of water currently located on each grid cell, ranging from 0 to 1)
+* Drain rate (a randomly generated rate of drainage of water from each cell) 
 * Yield (The amount of crop biomass currently located on each grid cell, ranging from 0 to 10)
 
+
 Environment-owned methods/procedures  
-* Initialize (random water in all grid cells)
+* Initialize (random drain rate seed in all grid cells)
+* Drain (water is depleted from each cell by fixed amount per step)
 * Evaporate (water evaporates as a function of temperature)
-* Rain (replenishes water in grid cells. Amount of rain is dependent on if Monsoon season = T or F)
+* Rain (replenishes water in grid cells. Amount and frequency of rain is dependent on if Monsoon season = T or F)
 * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
 * End Monsoon (set Monsoon = F after 175 steps)
-* Grow (crops grow if the cell has been sown and water content > 0. Growth rate is a function of water and continues for 120 steps)
+* Grow (crops grow if the cell has been sown and water content > 0.25 Growth rate is a function of water and continues for 120 steps)
 * Die (crops die if water < 0.25 for too long)
 
 ```python
@@ -64,11 +67,11 @@ The agents in this model will be individual farmers, which are each associated w
 
 Agent-owned variables
 * Memory (a recollection of when the monsoon came in previous years)
-* Wealth (will be incorporated in later iterations)
+* Yield history (a history of all yields from years past)
 
 Agent-owned methods/procedures
 * Sow (farmer decides to sow crops based on a predetermined baseline or memory if available)
-* Reap (farmer harvests yield on cell and sets cell to zero. The harvest will be converted to wealth in later iterations)
+* Reap (farmer harvests yield on cell and sets cell yield value to zero. The harvest will be converted to wealth in later iterations)
 
 ```python
 # Include first pass of the code you are thinking of using to construct your agents
@@ -83,7 +86,7 @@ Agent-owned methods/procedures
  
 **_Interaction Topology_**
 
-In the first round, agents will only interact with their own grid cell or 'plot'. They will decide when to sow based on a set baseline for the monsoon season, and will harvest their crops when the growing season is over. In subsequent rounds, agents will use their memory to inform a prediction of when the monsoon season will occur, and will sow their crops accordingly. In the first iteration of this model, there will be no interaction between agents. 
+In the first round, agents will only interact with their own grid cell or 'plot'. They will decide when to sow based on a baseline start time for the monsoon season, and will harvest their crops when the growing season is over. In subsequent rounds, agents will use their memory to inform a prediction of when the monsoon season will occur, and will sow their crops accordingly. In the first iteration of this model, there will be no interaction between agents. 
  
 **_Action Sequence_**
 
