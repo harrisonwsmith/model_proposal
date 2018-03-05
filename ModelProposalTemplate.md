@@ -1,4 +1,4 @@
-# Model Proposal for _Farmer decision making and climate change_
+# Model Proposal for _Farmer decision making in the face of climate change_
 
 _Harrison Smith_
 
