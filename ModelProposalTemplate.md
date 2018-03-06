@@ -94,6 +94,8 @@ class Model: # why write (Object) after the class name?
         # set up history variables
         self.history_space = []
         self.history_yield_global = 
+        self.history_yield_local = []
+        self.water_history = [] # this also needs to be local, or cell by cell. Should this be done for every tick?
         self.history_monsoon_start = [] # this will be global
         
         # Call setup methods to initialize cells, farmers, and environment
@@ -130,6 +132,8 @@ class Model: # why write (Object) after the class name?
     def get_yield_global(self):
     
     def get_yield_local(self, farmer_id):
+    
+    def get_water(self, farmer_id):
     
     def get_sow_date(self, farmer_id):
     
@@ -182,9 +186,8 @@ class Farmer:
     # set farmer memory
     self.sow_history = []
     self.harvest_history = []
-    self.water_history = [] # this also needs to be local, or cell by cell. Should this be done for every tick?
     self.monsoon_memory = [] # should be set to baseline for first run, then average
-    sefl.yield_history = []
+
     
     def sow(self, sow_date):
     
