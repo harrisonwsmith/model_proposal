@@ -65,12 +65,14 @@ import pandas
 from ipywidgets import interact
 
 class Model: # why write (Object) after the class name?
-    def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
+    def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, pressure, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
         # set up model parameters
         self.grid_size = grid_size
         self.temp_init = temp_init
         self.temp_change = temp_change # still need to define defaults for above three parameters
-        self.evaporate = # a constant * temperature
+        self.pressure = exp(20.386 - (5132/(self_temp + 273.15))
+        self.evaporate = if self.pressure > 760: self.evaporate = 
+        
         self.rainprob = # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
         self.rain = # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
         self.monsoon_init = # if t=10, set True, ends at t=60
