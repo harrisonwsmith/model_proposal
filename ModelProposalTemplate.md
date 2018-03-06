@@ -179,7 +179,11 @@ class Farmer:
     self.farmer_id = farmer_id
     
     # set farmer parameters
-    self.sow_date = # should be equal to baseline at first, then should be average of other values
+    self.sow_date = 
+        if len(history_monsoon_start) > 4: 
+            sow_date = mean(history_monsoon_start[-5]
+        else:
+           sow_date = # basline start date (will likely be t=10)
     self.harvest_date = sow date + # the length of the growing season for wheat
     
     
