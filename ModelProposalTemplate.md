@@ -55,10 +55,6 @@ Environment-owned methods/procedures
 * Die (crops die if water < 0.2 for too long)
 
 ```python
-# Include first pass of the code you are thinking of using to construct your environment
-# This may be a set of "patches-own" variables and a command in the "setup" procedure, a list, an array, or Class constructor
-# Feel free to include any patch methods/procedures you have. Filling in with pseudocode is ok! 
-# NOTE: If using Netlogo, remove "python" from the markdown at the top of this section to get a generic code block
 
 # Imports
 import numpy
@@ -68,40 +64,28 @@ import pandas
 # Import widget methods
 from ipywidgets import interact
 
-class Model:
+class Model: # why write (Object) after the class name?
     def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
         # set up model parameters
         self.grid_size = grid_size
         self.temp_init = temp_init
-        self.temp_change = temp_change
-        # define defaults for above three parameters
-        self.evaporate = 
-        # a constant * temperature
-        self.rainprob = 
-        # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
-        self.rain = 
-        # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
-        self.monsoon_init = 
-        # if t=10, set True, ends at t=60
-        self.monsoon_new = 
-        # update monsoon date based on temperature
-        self.grow = 
-        # grow crops if seeded and if water
-        self.die = 
-        # kill crops if no water or temp too high
+        self.temp_change = temp_change # still need to define defaults for above three parameters
+        self.evaporate = # a constant * temperature
+        self.rainprob = # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
+        self.rain = # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
+        self.monsoon_init = # if t=10, set True, ends at t=60
+        self.monsoon_new = # update monsoon date based on temperature
+        self.grow = # grow crops if seeded and if water
+        self.die = # kill crops if no water or temp too high
         
-        self.drain_rate = 
-        # randomly distribute drainage rates among cells
-        self.water = 
-        # amount of water in a given cell. Maybe this belongs in the cell class?
-        self.yield = 
-        # amoung of crops in a given cell. Maybe this belongs in the cell class also?
+        self.drain_rate = # randomly distribute drainage rates among cells
+        self.water = # amount of water in a given cell. Maybe this belongs in the cell class?
+        self.yield = # amoung of crops in a given cell. Maybe this belongs in the cell class also?
 
 
         # set state variables
         self.t = 0
-        self.space = numpy.array((0,0)) 
-        # this needs to be a 3D array I think...
+        self.space = numpy.array((0,0,0)) # this needs to be able to reference a 3D array I think
         self.farmers = []
         self.num_seasons = 0
         self.num_crop_failures = 0
@@ -110,18 +94,59 @@ class Model:
         # set up history variables
         self.history_space = []
         self.history_yield_global = 
-        self.history_yield_local = 
-        # unsure of how to do "local" or cell by cell yeild value
-        self.history_water = []
-        # this also needs to be local, or cell by cell
-        self.history_monsoon_start = []
-        # this will be global
+        self.history_monsoon_start = [] # this will be global
         
         # Call setup methods to initialize cells, farmers, and environment
         self.setup_cells()
-        self.setup_farmers
-        self.setup_environment
+        self.setup_farmers()
+        self.setup_environment() # I might need more setup functions but can't think of any right now
         
+    def setup_cells(self):
+        """
+        Method to setup cells
+        """
+        # fill this in
+        
+    def setup_farmers(self):
+        """
+        Method to setup farmers
+        """
+        # fill this in
+        
+    def setup_environment(self):
+        """
+        Method to setup environment
+        """
+        # fill this in
+    
+    def get_farmer_position(self, famer_id):
+        # will need to define farmer_id in the setup_farmers fucntion
+    
+    def rain(self, rainprob):
+        # not sure about this
+        
+    def grow(self, # if seeded, # if enough water):
+    
+    def get_yield_global(self):
+    
+    def get_yield_local(self, farmer_id):
+    
+    def get_sow_date(self, farmer_id):
+    
+    def step(self):
+    
+    def show_yield(self, t=None):
+    """
+    Return a projection of the space that shows how much crop yield is on each cell
+    """
+    
+    def show_water(self, t=None):
+    """
+    Return a projection of the space that shows how much water is on each cell
+    """
+    
+    
+    
 ```
 
 &nbsp; 
@@ -139,10 +164,33 @@ Agent-owned methods/procedures
 * Reap (farmer harvests yield on cell and sets cell yield value to zero. The harvest will be converted to wealth in later iterations)
 
 ```python
-# Include first pass of the code you are thinking of using to construct your agents
-# This may be a set of "turtle-own" variables and a command in the "setup" procedure, a list, an array, or Class constructor
-# Feel free to include any agent methods/procedures you have so far. Filling in with pseudocode is ok! 
-# NOTE: If using Netlogo, remove "python" from the markdown at the top of this section to get a generic code block
+# Setup a class for the farmers
+class Farmer:
+    def __init__(self, model, farmer_id, sow_date, harvest_date)
+    """
+    farmer by default sows on the established baseline and harvest x days after
+    """
+    # set model link and farmer id
+    self.model = model
+    self.farmer_id = farmer_id
+    
+    # set farmer parameters
+    self.sow_date = # should be equal to baseline at first, then should be average of other values
+    self.harvest_date = sow date + # the length of the growing season for wheat
+    
+    
+    # set farmer memory
+    self.sow_history = []
+    self.harvest_history = []
+    self.water_history = [] # this also needs to be local, or cell by cell. Should this be done for every tick?
+    self.monsoon_memory = [] # should be set to baseline for first run, then average
+    sefl.yield_history = []
+    
+    def sow(self, sow_date):
+    
+    
+    def harvest(self, harvest_date):
+
 ```
 
 &nbsp; 
