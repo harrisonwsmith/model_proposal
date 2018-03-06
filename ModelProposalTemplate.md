@@ -70,22 +70,58 @@ from ipywidgets import interact
 
 class Model:
     def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
+        # set up model parameters
         self.grid_size = grid_size
-        self.temp_init = #
-        self.temp_change = #
-        self.water = #
-        self.yield = #
-        self.drain_rate = # randomly distribute drainage rates among cells
-        self.evaporate = #  a constant * temperature
-        self.rainprob = # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
-        self.rain = # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
-        self.monsoon_init = # if t=10, set True, ends at t=60
-        self.monsoon_new = # update monsoon date based on temperature
-        self.grow = # grow crops if seeded and if water
-        self.die = # kill crops if no water or temp too high
+        self.temp_init = temp_init
+        self.temp_change = temp_change
+        # define defaults for above three parameters
+        self.evaporate = 
+        # a constant * temperature
+        self.rainprob = 
+        # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
+        self.rain = 
+        # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
+        self.monsoon_init = 
+        # if t=10, set True, ends at t=60
+        self.monsoon_new = 
+        # update monsoon date based on temperature
+        self.grow = 
+        # grow crops if seeded and if water
+        self.die = 
+        # kill crops if no water or temp too high
         
+        self.drain_rate = 
+        # randomly distribute drainage rates among cells
+        self.water = 
+        # amount of water in a given cell. Maybe this belongs in the cell class?
+        self.yield = 
+        # amoung of crops in a given cell. Maybe this belongs in the cell class also?
+
+
+        # set state variables
         self.t = 0
-        self.space = numpy.array((0,0,0)) # this needs to be a 3D array I think...
+        self.space = numpy.array((0,0)) 
+        # this needs to be a 3D array I think...
+        self.farmers = []
+        self.num_seasons = 0
+        self.num_crop_failures = 0
+        
+        
+        # set up history variables
+        self.history_space = []
+        self.history_yield_global = 
+        self.history_yield_local = 
+        # unsure of how to do "local" or cell by cell yeild value
+        self.history_water = []
+        # this also needs to be local, or cell by cell
+        self.history_monsoon_start = []
+        # this will be global
+        
+        # Call setup methods to initialize cells, farmers, and environment
+        self.setup_cells()
+        self.setup_farmers
+        self.setup_environment
+        
 ```
 
 &nbsp; 
