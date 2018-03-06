@@ -13,7 +13,7 @@ _Harrison Smith_
 ### Goal 
 *****
  
-The goal of this model will be to explore how farmers in different contexts may respond or adapt to climate change. Specifically, it will focus on how individual perceptions of climate change may affect sow dates and the agricultural matrix at the landscape level. 
+The goal of this model will be to explore how farmers in India may respond or adapt to increased variability in the onset of the monsoon season. Specifically, it will focus on how access to irrigation during the monsoon season may affect sow dates, irrigation use, and and yield. 
 
 &nbsp;  
 ### Justification
@@ -24,7 +24,7 @@ Farmer decision is a complex and heterogeneous process that is highly context de
 ### Main Micro-level Processes and Macro-level Dynamics of Interest
 ****
 
-Farmer decision making at the individual level is dependent on many factors, such as income, irrigation type, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding what date to sow their crops. If the first iteration of this is successful, I would eventually like to incorporate other factors such as wealth of farmers, irrigation type, market access, and different farm sizes. At the Macro-level, this model will examine the dynamics of how crop yields are affected by a changing climate, and if or how farmers are able to respond to these changes. The emergent agricultural matrix that results from heterogeneous farmer decision making will also be the subject of analysis.
+Farmer decision making at the individual level is dependent on many factors, such as income, irrigation, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding when to sow their monsoon season crops. The sow date of monsoon crops is dependent upon access to irrigation. Farmers with access to irrigation may sow their crops earlier in the event of a delayed monsoon, while the sow date of farmers who do not have access to irrigation is dependent upon the arrival of the monsoon rains. If the first iteration of this is successful, I would eventually like to incorporate other factors such as wealth of farmers, market access, and different farm sizes. At the Macro-level, this model will examine how often farmers irrigate their crops and how much yield farmers 
 
 
 &nbsp; 
@@ -35,20 +35,15 @@ Farmer decision making at the individual level is dependent on many factors, suc
 The space of the model will consist of a 2D grid where each cell represents a farmer's plot. Each agent (farmer) will be located on a single cell and will interact only with that cell and the global environment.
 
 Environment-owned variables
-* Temperature (average temperature for the season)
-* Temperature rate of change (The rate of temperature increase per year, ranging from 0 to 0.1)
-* Monsoon Season (True or false value, true for only for 50 steps)
-* Water (The amount of water currently located on each grid cell, ranging from 0 to 1)
-* Drain rate (a randomly generated rate of drainage of water from each cell) 
-* Yield (The amount of crop biomass currently located on each grid cell)
+* Monsoon start (date of start of monsoon)
+* Irrigation
+* yield_total (The total crop biomass currently located on every grid cell)
+* yield_low (The total crop biomass of farmers with low access to irrigation)---> only irrigate in winter, 2-6 times in winter
+* yield_high (The total crop biomass of farmers with high access to irrigation)--> Irrigate for late monsoon and 2-6 times in winter
 
 
 Environment-owned methods/procedures  
 * Initialize (random drain rate seed in all grid cells)
-* Drain (water is depleted from each cell by fixed amount per step)
-* Evaporate (water evaporates as a function of temperature)
-* Rain probability (probability of rainfall, will be higher probability during monsoon)
-* Rain (replenishes water in grid cells. Amount of rain is dependent on if Monsoon season = T or F)
 * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
 * End Monsoon (set Monsoon = F after 50 steps)
 * Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 40 steps)
@@ -162,12 +157,15 @@ class Model: # why write (Object) after the class name?
 The agents in this model will be individual farmers, which are each associated with a given grid cell.
 
 Agent-owned variables
-* Memory (a recollection of when the monsoon came in previous years)
 * Yield history (a history of all yields from years past)
+* Irrigation history (number of times they irrigated their plot)
 
 Agent-owned methods/procedures
-* Sow (farmer decides to sow crops based on a predetermined baseline or memory if available)
-* Reap (farmer harvests yield on cell and sets cell yield value to zero. The harvest will be converted to wealth in later iterations)
+* sow_monsoon (farmer decides to sow crops based on a predetermined baseline or memory if available)
+* harvest_monsoon
+* Irrigate (farmer irrigates their plot)
+* sow_winter
+* harvest_winter
 
 ```python
 # Setup a class for the farmers
