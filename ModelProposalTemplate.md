@@ -24,8 +24,7 @@ Farmer decision is a complex and heterogeneous process that is highly context de
 ### Main Micro-level Processes and Macro-level Dynamics of Interest
 ****
 
-Farmer decision making at the individual level is dependent on many factors, such as income, irrigation, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding when to sow their monsoon season crops. The sow date of monsoon crops is dependent upon access to irrigation. Farmers with access to irrigation may sow their crops earlier in the event of a delayed monsoon, while the sow date of farmers who do not have access to irrigation is dependent upon the arrival of the monsoon rains. If the first iteration of this is successful, I would eventually like to incorporate other factors such as wealth of farmers, market access, and different farm sizes. At the Macro-level, this model will examine how often farmers irrigate their crops and how much yield farmers 
-
+Farmer decision making at the individual level is dependent on many factors, such as income, irrigation, market access, and farm size, among others. At the Micro-level, this model will focus on the process of farmers deciding whether or not to irrigate their monsoon season crops. The sow date of monsoon crops is dependent upon access to irrigation. Farmers with access to irrigation may sow their crops earlier in the event of a delayed monsoon, while the sow date of farmers who do not have access to irrigation is dependent upon the arrival of the monsoon rains. This becomes important because if monsoon cropping is delayed, winter crops will also be delayed. Winter crops (wheat) are exposed to heat stress and at the end of the growing season as the summer months approach, and therefore they suffer yield loss proportional to the number of days of delay. At the Macro-level, this model will examine how often farmers irrigate their crops and how much yield farmers get based on different irrigation practices. If the first iteration of this is successful, I would  like to incorporate perceptions of climate change into the model, may have an effect on irrigation decisions. This could have important implications for ground water depletion, as farmers may choose to irrigate monsoon crops in order to adapt to climate change, further exploiting an already overexploited resource. 
 
 &nbsp; 
 ## Model Outline
@@ -35,19 +34,21 @@ Farmer decision making at the individual level is dependent on many factors, suc
 The space of the model will consist of a 2D grid where each cell represents a farmer's plot. Each agent (farmer) will be located on a single cell and will interact only with that cell and the global environment.
 
 Environment-owned variables
-* Monsoon start (date of start of monsoon)
-* yield_total (The total crop biomass currently located on every grid cell)
-* yield_low (The mean crop biomass of farmers with low access to irrigation)---> only irrigate in winter, 2-6 times in winter
-* yield_high (The total crop biomass of farmers with high access to irrigation)--> Irrigate for late monsoon and 2-6 times in winter
+* Monsoon delay (how many days the monsoon is delayed)
+* global yield (yield of all cells combined)
+* yield_nonirrigated (The total yield of farmers without access to irrigation during the monsoon season)
+* yield_irrigated (The total yield of farmers with access to irrigation during monsoon season)
 
 
 Environment-owned methods/procedures  
-* Initialize (random drain rate seed in all grid cells)
-* 
-* Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
-* End Monsoon (set Monsoon = F after 50 steps)
-* Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 40 steps)
-* Die (crops die if water < 0.2 for too long)
+* Setup (sets up the space and the farmers)
+* Get farmer position (returns position of a given farmer)
+* Get yield of non irrigated plots
+* Get yield of irrigated plots
+* Get total yield from all plots
+* Step (each step represents a year)
+* Show yield (display a grid showing yield amounts on each cell)
+
 
 ```python
 
@@ -102,7 +103,7 @@ class Model: # why write (Object) after the class name?
             # loop until unique
             is_occupied = True
             while is_occupied:
-                # Sample location
+                # Sample location... Maybe this doesn't need to be random. Try range()?
                 random_x = numpy.random.randint(0, self.grid_size)
                 random_y = numpy.random.randint(0, self.grid_size)
                 
@@ -123,21 +124,39 @@ class Model: # why write (Object) after the class name?
     def get_farmer_position(self, farmer_id):
         return numpy.reshape(numpy.where(self.space == farmer_id), (1,2))[0].tolist()
 
-    def get_yield_global(self):
+    def get_global_yield(self):
+        yield_list = []
+        for farmer in self.farmers:
+            yield_list.append(farmer.farmer_yield)
+        return fsum(yield_list)
+        
+    def get_global_irrigation(self):
+        irrigation_list = []
+        for farmer in self.farmers:
+            irrigation_list.append(farmer.farmer_total_irrigation)
+        return sum(irrigation_list)
     
-    def get_yield_local(self, farmer_id):
+    def step_year(self):
+        self.farmers.monsoon_season()
+        self.farmers.winter_season()
+        self.farmers.get_farmer_position()
     
     def step(self):
-    
+        self.setup_plots()
+        self.setup_farmers()
+        
+        self.history_global_yield.append(self.get_global_yield)
+        self.history_global_irrigation.append(self.get_global_irrigation)
+        self.farmers.reset()
+        self.t += 1
+        
     def show_yield(self, t=None):
     """
     Return a projection of the space that shows how much crop yield is on each cell
     """
     
-
-    
-    
-    
+    # haven't gotten to this yet
+  
 ```
 
 &nbsp; 
@@ -147,16 +166,17 @@ class Model: # why write (Object) after the class name?
 The agents in this model will be individual farmers, which are each associated with a given grid cell.
 
 Agent-owned variables
+* Farmer ID (unique id for each farmer)
+* Irrigation access (whether or not a farmer has access to irrigation during monsoon season)
 * Yield history (a history of all yields from years past)
 * Irrigation history (number of times they irrigated their plot, and what season they did it)
 * Irrigation access (access to irrigation during monsoon season)
 
 Agent-owned methods/procedures
-* sow_monsoon (farmer decides to sow crops based on a predetermined baseline or memory if available)
-* harvest_monsoon
-* irrigate (farmer irrigates their plot)
-* sow_winter
-* harvest_winter
+* monsoon season (farmer decides to irrigate or not based on if monsoon is delayed)
+* winter season (farmer irrigates plot random number of times in winter season, and yield is calculated based on if farmer delayed monsoon crop)
+* get farmer ID (gets the ID for a given farmer)
+
 
 ```python
 # Setup a class for the farmers
@@ -214,9 +234,16 @@ class Farmer:
         # update the irrigation history lists for each farmer
         self.history_win_irrigation.append(win_irrigation_count)
         self.history_farmer_total_irrigation.append(farmer_total_irrigation_count)
-    
-    def get_id(self):
-        return self.model.get_farmer_id(self.farmer_id)
+        self.history_farmer_yield.append(self.farmer_yield)
+        
+    # I'm not exactly sure what this is doing at this point
+    def get_position(self):
+        return self.model.get_farmer_position(self.farmer_id)
+        
+    def reset(self):
+        self.mon_irrgation_count = 0
+        self.win_irrigation_count = 0
+        self.farmer_yield = 0
 ```
 
 &nbsp; 
@@ -225,23 +252,18 @@ class Farmer:
  
 **_Interaction Topology_**
 
-In the first round, agents will only interact with their own grid cell or 'plot'. They will decide when to sow based on a baseline start time for the monsoon season, and will harvest their crops when the growing season is over. In subsequent rounds, agents will use their memory to inform a prediction of when the monsoon season will occur, and will sow their crops accordingly. In the first iteration of this model, there will be no interaction between agents. 
+In the first round, agents will only interact with their own grid cell or 'plot' and their environment. They will decide whether or not to irrigate their crops based on the start time for the monsoon season and their access to irrigation, and their yields will be the result of if they had to delay their monsoon crop. In the first iteration of this model, there will be no interaction between agents, but social dynamics may be incorporated in later iterations.
  
 **_Action Sequence_**
 
 In a given turn... 
 
 The environment will:
-1. Set evaporation rates as a function of current temperature
-2. Test probability of rain, if True then rain on all cells
-
-Each cell will:
-1. Change the amount of water in each cell based on evaporation rate and drainage rate
-2. Grow crops if there is enough water, the cell is sown, and it is during growing season (within 50 days of sow date)
+1. Set cells up with one farmer in each cell
 
 Each agent will:
-1. Sow crops if not sown yet and store the sow date
-2. Record total yield and then set yield to zero if date = (sow date) + 50
+1. Decide to irrigate during monsoon season or not based on access to irrigation
+2. Record number of instances of irrigation and record yield
 
 
 
