@@ -36,14 +36,14 @@ The space of the model will consist of a 2D grid where each cell represents a fa
 
 Environment-owned variables
 * Monsoon start (date of start of monsoon)
-* Irrigation
 * yield_total (The total crop biomass currently located on every grid cell)
-* yield_low (The total crop biomass of farmers with low access to irrigation)---> only irrigate in winter, 2-6 times in winter
+* yield_low (The mean crop biomass of farmers with low access to irrigation)---> only irrigate in winter, 2-6 times in winter
 * yield_high (The total crop biomass of farmers with high access to irrigation)--> Irrigate for late monsoon and 2-6 times in winter
 
 
 Environment-owned methods/procedures  
 * Initialize (random drain rate seed in all grid cells)
+* 
 * Start Monsoon (set Monsoon = T, dependent on temperature where higher temperature delays monsoon start)
 * End Monsoon (set Monsoon = F after 50 steps)
 * Grow (crops grow if the cell has been sown and water content > 0.2 Growth rate is a function of water and continues for 40 steps)
@@ -60,40 +60,25 @@ import pandas
 from ipywidgets import interact
 
 class Model: # why write (Object) after the class name?
-    def __init__(self, grid_size, temp_init, temp_change, water, yield, drain_rate, pressure, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
+    def __init__(self, grid_size, monsoon_start=152, water, yield, drain_rate, pressure, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
         # set up model parameters
         self.grid_size = grid_size
-        self.temp_init = temp_init
-        self.temp_change = temp_change # still need to define defaults for above three parameters
-        self.pressure = exp(20.386 - (5132/(self_temp + 273.15))
-        self.evaporate = if self.pressure > 760: self.evaporate = 
-        
-        self.rainprob = # probability of rain event (0.25 when monsoon=F, 0.5 when monsoon=T)
-        self.rain = # fill every cell with rain (0-0.25 rain when monsoon=F, 0.25 to 0.5 when monsoon=T)
+        self.monsoon_start = monsoon_start
         self.monsoon_init = # if t=10, set True, ends at t=60
         self.monsoon_new = # update monsoon date based on temperature
-        self.grow = # grow crops if seeded and if water
-        self.die = # kill crops if no water or temp too high
-        
-        self.drain_rate = # randomly distribute drainage rates among cells
-        self.water = # amount of water in a given cell. Maybe this belongs in the cell class?
         self.yield = # amoung of crops in a given cell. Maybe this belongs in the cell class also?
 
 
         # set state variables
         self.t = 0
-        self.space = numpy.array((0,0,0)) # this needs to be able to reference a 3D array I think
+        self.space = numpy.array((0,0)) # this needs to be able to reference a 3D array I think
         self.farmers = []
-        self.num_seasons = 0
-        self.num_crop_failures = 0
-        
+        self.num_years = 0
         
         # set up history variables
-        self.history_space = []
-        self.history_yield_global = 
-        self.history_yield_local = []
-        self.water_history = [] # this also needs to be local, or cell by cell. Should this be done for every tick?
-        self.history_monsoon_start = [] # this will be global
+        self.history_space = [] # not sure yet if I need this one
+        self.history_yield_global = []
+        self.history_monsoon_start = []
         
         # Call setup methods to initialize cells, farmers, and environment
         self.setup_cells()
@@ -163,14 +148,14 @@ Agent-owned variables
 Agent-owned methods/procedures
 * sow_monsoon (farmer decides to sow crops based on a predetermined baseline or memory if available)
 * harvest_monsoon
-* Irrigate (farmer irrigates their plot)
+* irrigate (farmer irrigates their plot)
 * sow_winter
 * harvest_winter
 
 ```python
 # Setup a class for the farmers
 class Farmer:
-    def __init__(self, model, farmer_id, sow_date, harvest_date)
+    def __init__(self, model, farmer_id, irrigation_access, sow_date, harvest_date, irrigation_count)
     """
     farmer by default sows on the established baseline and harvest x days after
     """
@@ -179,18 +164,23 @@ class Farmer:
     self.farmer_id = farmer_id
     
     # set farmer parameters
-    self.sow_date = 
-        if len(history_monsoon_start) > 4: 
-            sow_date = mean(history_monsoon_start[-5]
+    self.sow_monsoon = 
+        if irrigation == TRUE:
+            sow_date = 152
         else:
-           sow_date = # basline start date (will likely be t=10)
-    self.harvest_date = sow date + # the length of the growing season for wheat
+            sow_monsoon = monsoon_start
+    self.harvest_monsoon = sow_monsoon + 122
+    self.sow_winter = harvest_monsoon + 45
+    self.harvest_winter = sow_winter + 122
     
     
-    # set farmer memory
-    self.sow_history = []
-    self.harvest_history = []
-    self.monsoon_memory = [] # should be set to baseline for first run, then average
+    # set farmer history
+    self.monsoon_sowdate_history = []
+    self.monsoon_irrgation_count = 0
+    self.winter_irrigation_count = 0
+    self.total_irrigation_count = 0
+    self.yield_history_local = 
+
 
     
     def sow(self, sow_date):
