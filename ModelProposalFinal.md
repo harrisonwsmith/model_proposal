@@ -260,9 +260,12 @@ In a given turn...
 
 The environment will:
 1. Set cells up with one farmer in each cell
+2. Calculate global yield
+3. Calculate global irrigation count
 
 Each agent will:
 1. Decide to irrigate during monsoon season or not based on access to irrigation
+2. Irrigate winter crops
 2. Record number of instances of irrigation and record yield
 
 
@@ -270,39 +273,32 @@ Each agent will:
 &nbsp; 
 ### 4) Model Parameters and Initialization
 
-The global parameters that will be used in this model will be temperature, evaporation rate, growth rate, and monsoon season.
+The global parameters that will be used in this model will be monsoon delay.
 
-The model will be initialized with no crops and a start time (t) of zero. Drainage rates will be randomly distributed throughout the grid using a specified seed, and evaporation rate will be calculated based on the temperature. Initial rain probability and amount will be set for the non-monsoon season, and an initial rain event will add some water to all patches. Farmers will sow their crops using a baseline (the "historical" start date of the monsoon) when t=5, or after 5 steps. In the first round or "season", the monsoon will start on this baseline date (t=5). After cells have been sown, crops will grow as a function of water availability (sigmoid function).
+The model will be initialized with a start time (t) of zero. 
 
 The model schedule will then procede as follows:
 1. Model is initialized using above description
-2. Farmers sow crops using baseline (t=10) or average of 5 previous monsoon start dates
-3. Monsoon starts at t=10 intially, but is delayed as a function of temperature increase rate
-4. If a cell has sufficient water, plants grow (growth rate is a sigmoid function where x=water amount)
-5. After 40 steps from sow date, crops stop growing
-6. After 50 steps, the monsoon season ends
-7. Farmer's harvest crops
-8. Adjust monsoon start date based on temperature rate change
-9. Run model until monsoon season ends
-10. Restart the growing season (t=0)
-11. Farmer's calculate new sow date using previous monsoon start dates
-12. Update temperature using rate of temperature change
-13. Update evaporation rate using new temperature
-12. Update Monsoon start date using temperature
-13. Repeat above steps for specified number of "seasons"
+2. Farmers decide whether to irrigate during monsoon season
+3. Farmers irrigate heterogeneously durring winter season
+4. Farmers calculate yield and record irrigation counts
+5. Farmers store irrigation counts and yield in history
+6. Global environment calculates global yield and irrigation counts
+7. Farmers reset yield and irrigation counts
+8. Repeat model for a new season
 
 &nbsp; 
 
 ### 5) Assessment and Outcome Measures
 
-In order to assess my model outcomes, I will use several metrics. The main metric I will look at will be sow date over time, which will answer my central question of how sow date will change in response to perception of climate change. I will also look at overall yield for each pixel and how that corresponds to sow date, and I will use this to determine the adaptive capacity of farmers in the face of climate change. 
+In order to assess my model outcomes, I will look at number of irrigation instances over time, and yield over time, both at the global and individual level. I will also compare yield differences between farmers who have access to irrigation during the monsoon season with farmers who do not.
 
-In future iterations, I would also like to incorporate other factors such as income and wealth generated from crops. If I am able to incorporate these factors, I will also gather data on changes in wealth in order to assess my model outcomes.
+In future iterations, I would also like to incorporate other factors such as wealth, climate change perception, and ground water depletion. If I am able to incorporate these factors, I will also gather data on changes in wealth in order to assess my model outcomes. In addition, if I can incorporate ground water depletion and climate change perception, I will also include these in my analysis.
 
 &nbsp; 
 
 ### 6) Parameter Sweep
 
-The main parameter sweep I would look at is how different rates of temperature change affect farmer's ability grow crops and how it affects their sow date. I think it will also be interesting to look at different amounts of rainfall and how this might affect the results I get. 
+The main parameter sweep I would look at is how variability in monsoon date will affect farmer's yield and how it affects their frequency of irrigation. 
 
-In future iterations, I also hope to look at how different ranges of wealth, irrigation, or access to markets might affect my results. These parameters would also be included in a parameter sweep. 
+In future iterations, I also hope to look at how different ranges of wealth, irrigation, or access to markets might affect my results. These parameters would also be included in a parameter sweep for future iterations. 
