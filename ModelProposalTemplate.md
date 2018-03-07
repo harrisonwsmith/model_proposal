@@ -155,39 +155,54 @@ Agent-owned methods/procedures
 ```python
 # Setup a class for the farmers
 class Farmer:
-    def __init__(self, model, farmer_id, irrigation_access, sow_date, harvest_date, irrigation_count)
-    """
-    farmer by default sows on the established baseline and harvest x days after
-    """
-    # set model link and farmer id
-    self.model = model
-    self.farmer_id = farmer_id
+    def __init__(self, model, farmer_id, irrigation_access=0, sow_mon_date, harvest_mon_date=sow_mon_date + 122, sow_win_date = harvest_mon_date + 45, harvest_win_date = sow_win_date + 122, prob_irrigate=0.5)
+        """
+        farmer by default sows on the established baseline and harvest x days after
+        """
+        # set model link and farmer id
+        self.model = model
+        self.farmer_id = farmer_id
     
-    # set farmer parameters
-    self.sow_monsoon = 
-        if irrigation == TRUE:
-            sow_date = 152
+        # set farmer parameters
+        self.sow_mon_date = 
+            if irrigation == 0:
+                sow_mon_date = 152
+            else:
+                sow_mon_date = monsoon_start
+        self.harvest_mon_date = harvest_mon_date
+        self.sow_win_date = sow_win_date
+        self.harvest_win_date = harvest_win_date
+  
+    
+        # set farmer history
+        self.mon_sowdate_history = []
+        self.mon_irrgation_count = 0
+        self.win_irrigation_count = 0
+        self.total_irrigation_count = 0
+        self.yield_history_local = []
+    
+    def sow_monsoon(self):
+        if t == self.sow_mon_date:
+            return True
         else:
-            sow_monsoon = monsoon_start
-    self.harvest_monsoon = sow_monsoon + 122
-    self.sow_winter = harvest_monsoon + 45
-    self.harvest_winter = sow_winter + 122
-    
-    
-    # set farmer history
-    self.monsoon_sowdate_history = []
-    self.monsoon_irrgation_count = 0
-    self.winter_irrigation_count = 0
-    self.total_irrigation_count = 0
-    self.yield_history_local = 
-
-
-    
-    def sow(self, sow_date):
-    
-    
-    def harvest(self, harvest_date):
-
+            return False
+    def harvest_monsoon(self):
+        if t == self.harvest_mon_date:
+            return True
+        else:
+            return False
+    def sow_winter(self):
+        if t == self.sow_win_date:
+            return True
+        else:
+            return False
+    def harvest_winter(self):
+        if t == self.harvest_win_date:
+            return True
+        else:
+            return False
+    def get_id(self):
+        return self.model.get_farmer_id(self.farmer_id)
 ```
 
 &nbsp; 
