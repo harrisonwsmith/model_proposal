@@ -60,64 +60,72 @@ import pandas
 from ipywidgets import interact
 
 class Model: # why write (Object) after the class name?
-    def __init__(self, grid_size, monsoon_start=152, water, yield, drain_rate, pressure, evaporate, rainprob, rain, monsoon_init, monsoon_new, grow, die):
+    def __init__(self, grid_size, monsoon_delay=0, global_yield=0):
         # set up model parameters
         self.grid_size = grid_size
-        self.monsoon_start = monsoon_start
-        self.monsoon_init = # if t=10, set True, ends at t=60
-        self.monsoon_new = # update monsoon date based on temperature
-        self.yield = # amoung of crops in a given cell. Maybe this belongs in the cell class also?
-
+        self.monsoon_delay = monsoon_delay
+        self.global_yield = global_yield
 
         # set state variables
         self.t = 0
         self.space = numpy.array((0,0)) # this needs to be able to reference a 3D array I think
+        self.num_farmers = ((self.grid_size)*(self.grid_size))
         self.farmers = []
-        self.num_years = 0
         
         # set up history variables
-        self.history_space = [] # not sure yet if I need this one
-        self.history_yield_global = []
-        self.history_monsoon_start = []
+        # self.history_monsoon_delay = [] might add this in when I figure out how to parameterize variation in monsoon delay
+        self.history_global_yield = []
+        self.history_global_irrigation = []
         
         # Call setup methods to initialize cells, farmers, and environment
-        self.setup_cells()
-        self.setup_farmers()
-        self.setup_environment() # I might need more setup functions but can't think of any right now
+        self.setup_plots()
+        self.setup_farmers() # I might need more setup functions but can't think of any right now
         
-    def setup_cells(self):
+    def setup_plots(self):
         """
-        Method to setup cells
+        Method to setup gridcells
         """
-        # fill this in
+        # Initialize a space with Nan's
+        self.space = numpy.full((self.grid_size, self.grid_size), numpy.nan)
         
     def setup_farmers(self):
         """
         Method to setup farmers
         """
-        # fill this in
+        # create all farmers without placing them
+        for i in xrange(self.num_farmers):
+            self.farmers.append(Person(model=self,
+                                       farmer_id=i,
+                                       irrigation_access=False))
+        # place farmers into the space
+        for farmer in self.farmers:
+            # loop until unique
+            is_occupied = True
+            while is_occupied:
+                # Sample location
+                random_x = numpy.random.randint(0, self.grid_size)
+                random_y = numpy.random.randint(0, self.grid_size)
+                
+                # check if unique
+                if numpy.isnan(self.space[random_x, random_y]):
+                    is_occupied = False
+                else:
+                    is_occupied = True
+                    
+            # place farmer by setting their ID        
+            self.space[random_x, random_y] = farmer.farmer_id
+            
+            # give half of farmers access to irrigation during monsoon
+            if farmer.farmer_id >= (0.5 * self.num_cells):
+                farmer.irrigation_access=True
         
-    def setup_environment(self):
-        """
-        Method to setup environment
-        """
-        # fill this in
-    
-    def get_farmer_position(self, famer_id):
-        # will need to define farmer_id in the setup_farmers fucntion
-    
-    def rain(self, rainprob):
-        # not sure about this
-        
-    def grow(self, # if seeded, # if enough water):
-    
+
+    def get_farmer_position(self, farmer_id):
+        return numpy.reshape(numpy.where(self.space == farmer_id), (1,2))[0].tolist()
+
     def get_yield_global(self):
     
     def get_yield_local(self, farmer_id):
-    
-    def get_water(self, farmer_id):
-    
-    def get_sow_date(self, farmer_id):
     
     def step(self):
     
@@ -126,10 +134,7 @@ class Model: # why write (Object) after the class name?
     Return a projection of the space that shows how much crop yield is on each cell
     """
     
-    def show_water(self, t=None):
-    """
-    Return a projection of the space that shows how much water is on each cell
-    """
+
     
     
     
@@ -143,7 +148,8 @@ The agents in this model will be individual farmers, which are each associated w
 
 Agent-owned variables
 * Yield history (a history of all yields from years past)
-* Irrigation history (number of times they irrigated their plot)
+* Irrigation history (number of times they irrigated their plot, and what season they did it)
+* Irrigation access (access to irrigation during monsoon season)
 
 Agent-owned methods/procedures
 * sow_monsoon (farmer decides to sow crops based on a predetermined baseline or memory if available)
@@ -155,7 +161,7 @@ Agent-owned methods/procedures
 ```python
 # Setup a class for the farmers
 class Farmer:
-    def __init__(self, model, farmer_id, irrigation_access=0, sow_mon_date, harvest_mon_date=sow_mon_date + 122, sow_win_date = harvest_mon_date + 45, harvest_win_date = sow_win_date + 122, prob_irrigate=0.5)
+    def __init__(self, model, farmer_id, irrigation_access=False)
         """
         farmer by default sows on the established baseline and harvest x days after
         """
@@ -164,43 +170,51 @@ class Farmer:
         self.farmer_id = farmer_id
     
         # set farmer parameters
-        self.sow_mon_date = 
-            if irrigation == 0:
-                sow_mon_date = 152
-            else:
-                sow_mon_date = monsoon_start
-        self.harvest_mon_date = harvest_mon_date
-        self.sow_win_date = sow_win_date
-        self.harvest_win_date = harvest_win_date
-  
+        self.irrigation_access = irrigation_access
     
-        # set farmer history
-        self.mon_sowdate_history = []
+        # set farmer state variables
         self.mon_irrgation_count = 0
         self.win_irrigation_count = 0
-        self.total_irrigation_count = 0
-        self.yield_history_local = []
+        self.farmer_total_irrigation = (self.win_irrigation_count + self.mon_irrigation_count)
+        self.farmer_yield = 0
+        
+        # set farmer history
+        self.history_farmer_yield = []
+        self.history_mon_irrigation = []
+        self.history_win_irrigation = []
+        self.hisory_farmer_total_irrigation = []
+        
+    # farmers decide to irrigate their crops if monsoon is delayed
+    def monsoon_season(self):
+        # if monsoon is not delayed, all farmers will plant crops at same time (monsoon start date)
+        if self.model.monsoon_delay == 0:
+            self.mon_irrigation_count = 0 
+        else: 
+            # if monsoon is delayed, farmers with irrigation access will irrigate so they can go ahead and plant their monsoon crop
+            if self.model.monsoon_delay =< 15
+                if self.irrigation_access == True:
+                    self.mon_irrigation_count = 1
+            # if monsoon is delayed more than 15 days, farmers with access to irrigation may irrigate again
+            if self.model.monsoon_delay > 15
+                if self.irrigation_access == True:
+                    self.mon_irrigation_count = 2 
+        self.history_mon_irrigation.append(mon_irrigation_count)
     
-    def sow_monsoon(self):
-        if t == self.sow_mon_date:
-            return True
+    # farmers irrigate crops during winter in a heterogeneous fashion
+    def winter_season(self):
+        self.win_irrigation_count = numpy.random.randint(2,6)
+        
+        # if farmers did not irrigate during monsoon season, their winter crops will suffer heat stress
+        if self.model.monsoon_delay > 0:
+            if self.irrigation_access == False:
+                self.farmer_yield = 1-(self.monsoon_delay/100)
         else:
-            return False
-    def harvest_monsoon(self):
-        if t == self.harvest_mon_date:
-            return True
-        else:
-            return False
-    def sow_winter(self):
-        if t == self.sow_win_date:
-            return True
-        else:
-            return False
-    def harvest_winter(self):
-        if t == self.harvest_win_date:
-            return True
-        else:
-            return False
+            self.farmer_yield = 1
+        
+        # update the irrigation history lists for each farmer
+        self.history_win_irrigation.append(win_irrigation_count)
+        self.history_farmer_total_irrigation.append(farmer_total_irrigation_count)
+    
     def get_id(self):
         return self.model.get_farmer_id(self.farmer_id)
 ```
