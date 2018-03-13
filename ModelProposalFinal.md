@@ -61,6 +61,11 @@ import pandas
 from ipywidgets import interact
 
 class Model: # why write (Object) after the class name?
+
+## LS COMMENTS ##
+# This is a holdover from Python 2.x where you need it to tell Python that your new class is a type of Object. In Python 3, this is no 
+# longer required (but it doesn't hurt anything to have it)
+
     def __init__(self, grid_size, monsoon_delay=0, global_yield=0):
         # set up model parameters
         self.grid_size = grid_size
@@ -70,6 +75,11 @@ class Model: # why write (Object) after the class name?
         # set state variables
         self.t = 0
         self.space = numpy.array((0,0)) # this needs to be able to reference a 3D array I think
+        
+        ## LS Comments ##
+        # How so? I don't believe you are trying to represent 3D space, correct? If you are looking 
+        # to store multiple values for each individual position, you can get at that by having each space in the array store a list.
+        
         self.num_farmers = ((self.grid_size)*(self.grid_size))
         self.farmers = []
         
@@ -106,6 +116,10 @@ class Model: # why write (Object) after the class name?
                 # Sample location... Maybe this doesn't need to be random. Try range()?
                 random_x = numpy.random.randint(0, self.grid_size)
                 random_y = numpy.random.randint(0, self.grid_size)
+                
+                ## LS COMMENTS ##
+                # If your cells are not interacting with one another, then it doesn't matter where they are placed. Would suggest just 
+                # looping through and placing farmers at a regular interval if you are hoping to use it for visualization purposes.
                 
                 # check if unique
                 if numpy.isnan(self.space[random_x, random_y]):
@@ -240,6 +254,9 @@ class Farmer:
     def get_position(self):
         return self.model.get_farmer_position(self.farmer_id)
         
+    ## LS COMMENTS ##
+    # Since position isn't changing or doing much in this simulation, I don't think you need this part.
+    
     def reset(self):
         self.mon_irrgation_count = 0
         self.win_irrigation_count = 0
@@ -302,3 +319,6 @@ In future iterations, I would also like to incorporate other factors such as wea
 The main parameter sweep I would look at is how variability in monsoon date will affect farmer's yield and how it affects their frequency of irrigation. 
 
 In future iterations, I also hope to look at how different ranges of wealth, irrigation, or access to markets might affect my results. These parameters would also be included in a parameter sweep for future iterations. 
+
+__*LS COMMENTS:*__
+*As discussed when we met, this is a solid basis for designing more advanced models in the future. Given that you have a pretty deterministic model with no feedbacks currently, I am expecting that this will provide a relatively "boring" baseline for comparison. If you get this up and going soon, I would suggest pushing to incorporate some more features that introduce more interdependencies and/or randomness for the final project to see what happens.
